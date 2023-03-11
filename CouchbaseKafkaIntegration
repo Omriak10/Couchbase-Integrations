@@ -1,0 +1,21 @@
+import com.couchbase.kafka.CouchbaseKafkaConnector;
+import com.couchbase.kafka.CouchbaseKafkaConfig;
+
+public class CouchbaseKafkaIntegration {
+   public static void main(String[] args) {
+      // Define the configuration for the Couchbase Kafka connector
+      CouchbaseKafkaConfig config = new CouchbaseKafkaConfig();
+      config.setBootstrapServers("localhost:9092");
+      config.setBucket("my-bucket");
+      config.setConnectionTimeoutMs(10000);
+
+      // Create a new instance of the Couchbase Kafka connector
+      CouchbaseKafkaConnector connector = new CouchbaseKafkaConnector(config);
+
+      // Start the connector to stream data from Couchbase to Kafka
+      connector.start();
+
+      // Consume the data from Kafka
+      // ...
+   }
+}
