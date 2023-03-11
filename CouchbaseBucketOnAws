@@ -1,0 +1,18 @@
+import com.couchbase.client.java.*;
+import com.couchbase.client.java.bucket.*;
+
+public class CouchbaseBucketOnAws {
+   public static void main(String[] args) {
+      // Connect to the Couchbase cluster running on Amazon AWS
+      Cluster cluster = CouchbaseCluster.create("aws-instance-name");
+      cluster.authenticate("username", "password");
+
+      // Create a new bucket with the specified name and settings
+      BucketSettings settings = new DefaultBucketSettings.Builder()
+              .type(BucketType.COUCHBASE)
+              .name("my-bucket")
+              .quota(100)
+              .build();
+      cluster.clusterManager().insertBucket(settings);
+   }
+}
