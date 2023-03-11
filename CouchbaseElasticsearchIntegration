@@ -1,0 +1,40 @@
+import com.couchbase.client.java.*;
+import com.couchbase.client.java.document.*;
+import com.couchbase.client.java.document.json.*;
+import com.couchbase.client.java.query.*;
+import com.couchbase.connect.elasticsearch.*;
+
+import java.net.InetSocketAddress;
+import java.util.*;
+
+public class CouchbaseElasticsearchIntegration {
+   public static void main(String[] args) {
+      // Connect to the Couchbase cluster
+      Cluster cluster = CouchbaseCluster.create("localhost");
+      Bucket bucket = cluster.openBucket("my-bucket");
+
+      // Define the configuration for the Elasticsearch plugin
+      Map<String, String> esConfig = new HashMap<>();
+      esConfig.put("es.host", "localhost:9200");
+      esConfig.put("es.username", "username");
+      esConfig.put("es.password", "password");
+
+      // Create a new instance of the Elasticsearch plugin
+      ElasticsearchTransformer transformer = new ElasticsearchTransformer(esConfig);
+
+      // Define a N1QL query to retrieve documents from Couchbase
+      String queryStr = "SELECT * FROM my-bucket WHERE type = 'user'";
+
+      // Execute the query and transform the results for Elasticsearch
+      N1qlQuery query = N1qlQuery.simple(queryStr);
+      N1qlQueryResult result = bucket.query(query);
+      List<JsonObject> docs = new ArrayList<>();
+      for (N1qlQueryRow row : result) {
+         JsonObject doc = row.value();
+         docs.add(transformer.transform(doc));
+      }
+
+      // Index the documents in Elasticsearch
+      ElasticsearchIO.writeEsJsonRDD(sc.parallelize(docs), "my-index/my-type");
+   }
+}
